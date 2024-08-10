@@ -108,7 +108,7 @@ const AudioPlayerModal = ({
             }}
         >
             <div
-                className="w-full max-w-md rounded-lg bg-white/20 p-6 shadow-lg"
+                className="w-full max-w-md rounded-lg bg-neutral-800 p-6 shadow-lg"
                 style={{
                     maxWidth: "600px",
                 }}
@@ -140,13 +140,13 @@ const AudioPlayerModal = ({
                     onChange={handleProgressChange}
                     className="mb-2 w-full appearance-none rounded-lg bg-white/40"
                 />
-                <div className="flex justify-between text-sm text-white/60">
+                <div className="flex justify-between text-sm text-stone-500">
                     <span>{formatTime(currentTime)}</span>
                     <span>{formatTime(duration)}</span>
                 </div>
                 <div className="mt-4 text-sm">
-                    <div className="text-white/80">{fileName}</div>
-                    <div className="text-xs text-white/30">
+                    <div className="text-stone-300">{fileName}</div>
+                    <div className="text-xs text-stone-500">
                         MODIFIED {modifiedDate}
                         <br/>
                         {fileSize}
