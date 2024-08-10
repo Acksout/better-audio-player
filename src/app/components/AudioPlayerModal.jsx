@@ -27,13 +27,11 @@ const AudioPlayerModal = ({
     };
 
     useEffect(() => {
-        console.log("Creating Howl instance with src:", src);
         soundRef.current = new Howl({
             src: [src],
             format: ["mp3"],
             html5: true,
             onload: () => {
-                console.log("Audio loaded, duration:", soundRef.current.duration());
                 setDuration(soundRef.current.duration());
             },
             onplay: () => {

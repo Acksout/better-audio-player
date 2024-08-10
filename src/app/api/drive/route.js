@@ -30,8 +30,6 @@ async function listFilesAndFolders(drive, folderId) {
 
 export async function GET() {
     try {
-        console.log("API route called");
-
         const auth = new google.auth.GoogleAuth({
             credentials: {
                 client_id: process.env.GOOGLE_CLIENT_ID,
@@ -43,15 +41,9 @@ export async function GET() {
             scopes: ["https://www.googleapis.com/auth/drive.readonly"],
         });
 
-        console.log("Auth created");
-
         const drive = google.drive({version: "v3", auth});
 
-        console.log("Drive instance created");
-
         const filesDetails = await listFilesAndFolders(drive, process.env.GOOGLE_DRIVE_DIRECTORY_ID);
-
-        console.log("Files fetched:", filesDetails);
 
         return NextResponse.json(filesDetails);
     } catch (error) {

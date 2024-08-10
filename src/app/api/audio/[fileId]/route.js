@@ -18,8 +18,6 @@ async function refreshAccessToken() {
         const tokenResponse = await client.refreshAccessToken();
         const credentials = tokenResponse.credentials;
 
-        console.log("Access token refreshed successfully:", credentials);
-
         return credentials;
     } catch (error) {
         console.error("Error refreshing access token:", error);
@@ -48,8 +46,6 @@ export async function GET(request, {params}) {
             "Content-Length": response.headers["content-length"],
             "Content-Disposition": `inline; filename="${response.headers["content-disposition"]}"`,
         };
-
-        console.log("Streaming audio file with headers:", headers);
 
         return new NextResponse(response.data, {headers});
     } catch (error) {
