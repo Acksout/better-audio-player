@@ -7,8 +7,8 @@ const spaceMono = Space_Mono({
 });
 
 export const metadata = {
-    title: "100 Audio Player",
-    description: "Sail the 7even seas?",
+    title: "808 Vault",
+    description: "You ain't heard nothin' yet!",
 };
 
 export default function RootLayout({children}) {
