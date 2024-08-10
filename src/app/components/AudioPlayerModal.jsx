@@ -20,12 +20,34 @@ const AudioPlayerModal = ({
     const progressRef = useRef(null);
 
     useEffect(() => {
+        console.log("Creating Howl instance with src:", src);
         soundRef.current = new Howl({
             src: [src],
-            onload: () => setDuration(soundRef.current.duration()),
+            format: ["mp3"], // Specify the format explicitly
+            html5: true, // Force HTML5 audio for streaming
+            onload: () => {
+                console.log("Audio loaded, duration:", soundRef.current.duration());
+                setDuration(soundRef.current.duration());
+            },
+            onloaderror: (id, error) => {
+                console.error("Error loading audio:", error);
+            },
         });
         return () => soundRef.current.unload();
     }, [src]);
+
+    const togglePlay = () => {
+        if (soundRef.current) {
+            if (isPlaying) {
+                soundRef.current.pause();
+            } else {
+                soundRef.current.play();
+            }
+            setIsPlaying(!isPlaying);
+        } else {
+            console.error("Howl instance not initialized");
+        }
+    };
 
     useEffect(() => {
         const updateTime = () => {
@@ -37,14 +59,6 @@ const AudioPlayerModal = ({
         if (isPlaying) updateTime();
     }, [isPlaying]);
 
-    const togglePlay = () => {
-        if (isPlaying) {
-            soundRef.current.pause();
-        } else {
-            soundRef.current.play();
-        }
-        setIsPlaying(!isPlaying);
-    };
 
     const handleProgressChange = (e) => {
         const newTime = (e.target.value / 100) * duration;
@@ -73,15 +87,15 @@ const AudioPlayerModal = ({
             }`}
         >
             <div
-                className="bg-gray-800 rounded-lg p-6 w-full max-w-md shadow-lg"
+                className="w-full max-w-md rounded-lg bg-gray-800 p-6 shadow-lg"
                 style={{
                     maxWidth: "600px",
                 }}
             >
-                <div className="flex justify-between items-center mb-4">
+                <div className="mb-4 flex items-center justify-between">
                     <button
                         onClick={togglePlay}
-                        className="bg-transparent border-none text-white text-2xl cursor-pointer"
+                        className="cursor-pointer border-none bg-transparent text-2xl text-white"
                     >
                         {isPlaying ? "❚❚" : "▶"}
                     </button>
@@ -91,7 +105,7 @@ const AudioPlayerModal = ({
                         max="100"
                         value={volume * 100}
                         onChange={handleVolumeChange}
-                        className="w-5 h-5 appearance-none bg-white cursor-pointer"
+                        className="h-5 w-5 cursor-pointer appearance-none bg-white"
                     />
                 </div>
                 <input
@@ -101,7 +115,7 @@ const AudioPlayerModal = ({
                     max="100"
                     value={(currentTime / duration) * 100 || 0}
                     onChange={handleProgressChange}
-                    className="w-full mb-2"
+                    className="mb-2 w-full"
                 />
                 <div className="flex justify-between text-sm">
                     <span>{formatTime(currentTime)}</span>
@@ -109,7 +123,7 @@ const AudioPlayerModal = ({
                 </div>
                 <div className="mt-4 text-sm">
                     <div>{fileName}</div>
-                    <div className="text-gray-500 text-xs">
+                    <div className="text-xs text-gray-500">
                         MODIFIED {modifiedDate}
                         <br/>
                         {fileSize}
@@ -118,7 +132,7 @@ const AudioPlayerModal = ({
                     </div>
                 </div>
                 <button
-                    className="absolute top-4 right-4 text-white text-xl"
+                    className="absolute top-4 right-4 text-xl text-white"
                     onClick={onClose}
                 >
                     &times;
