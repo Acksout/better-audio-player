@@ -19,15 +19,36 @@ const AudioPlayerModal = ({
     const soundRef = useRef(null);
     const progressRef = useRef(null);
 
+    const updateTime = () => {
+        if (soundRef.current && soundRef.current.playing()) {
+            setCurrentTime(soundRef.current.seek());
+            requestAnimationFrame(updateTime);
+        }
+    };
+
     useEffect(() => {
         console.log("Creating Howl instance with src:", src);
         soundRef.current = new Howl({
             src: [src],
-            format: ["mp3"], // Specify the format explicitly
-            html5: true, // Force HTML5 audio for streaming
+            format: ["mp3"],
+            html5: true,
             onload: () => {
                 console.log("Audio loaded, duration:", soundRef.current.duration());
                 setDuration(soundRef.current.duration());
+            },
+            onplay: () => {
+                setIsPlaying(true);
+                requestAnimationFrame(updateTime);
+            },
+            onpause: () => {
+                setIsPlaying(false);
+            },
+            onstop: () => {
+                setIsPlaying(false);
+                setCurrentTime(0);
+            },
+            onseek: () => {
+                setCurrentTime(soundRef.current.seek());
             },
             onloaderror: (id, error) => {
                 console.error("Error loading audio:", error);
@@ -43,27 +64,24 @@ const AudioPlayerModal = ({
             } else {
                 soundRef.current.play();
             }
-            setIsPlaying(!isPlaying);
         } else {
             console.error("Howl instance not initialized");
         }
     };
 
-    useEffect(() => {
-        const updateTime = () => {
-            if (soundRef.current && isPlaying) {
-                setCurrentTime(soundRef.current.seek());
-                requestAnimationFrame(updateTime);
-            }
-        };
-        if (isPlaying) updateTime();
-    }, [isPlaying]);
-
-
     const handleProgressChange = (e) => {
-        const newTime = (e.target.value / 100) * duration;
-        soundRef.current.seek(newTime);
-        setCurrentTime(newTime);
+        const newTime = (parseFloat(e.target.value) / 100) * duration;
+        if (soundRef.current) {
+            const wasPlaying = isPlaying;
+            if (wasPlaying) {
+                soundRef.current.pause();
+            }
+            soundRef.current.seek(newTime);
+            setCurrentTime(newTime);
+            if (wasPlaying) {
+                soundRef.current.play();
+            }
+        }
     };
 
     const handleVolumeChange = (e) => {
@@ -82,12 +100,17 @@ const AudioPlayerModal = ({
 
     return (
         <div
-            className={`fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-75 ${
+            className={`fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 ${
                 isOpen ? "visible" : "invisible"
             }`}
+            onClick={(e) => {
+                if (e.target.classList.contains("fixed")) {
+                    onClose();
+                }
+            }}
         >
             <div
-                className="w-full max-w-md rounded-lg bg-gray-800 p-6 shadow-lg"
+                className="w-full max-w-md rounded-lg bg-white/20 p-6 shadow-lg"
                 style={{
                     maxWidth: "600px",
                 }}
@@ -95,18 +118,20 @@ const AudioPlayerModal = ({
                 <div className="mb-4 flex items-center justify-between">
                     <button
                         onClick={togglePlay}
-                        className="cursor-pointer border-none bg-transparent text-2xl text-white"
+                        className="cursor-pointer border-none bg-transparent text-2xl text-white/60"
                     >
                         {isPlaying ? "❚❚" : "▶"}
                     </button>
-                    <input
-                        type="range"
-                        min="0"
-                        max="100"
-                        value={volume * 100}
-                        onChange={handleVolumeChange}
-                        className="h-5 w-5 cursor-pointer appearance-none bg-white"
-                    />
+                    <div className="h-4 w-1/4">
+                        <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={volume * 100}
+                            onChange={handleVolumeChange}
+                            className="w-full appearance-none rounded-lg bg-white/40"
+                        />
+                    </div>
                 </div>
                 <input
                     ref={progressRef}
@@ -115,15 +140,15 @@ const AudioPlayerModal = ({
                     max="100"
                     value={(currentTime / duration) * 100 || 0}
                     onChange={handleProgressChange}
-                    className="mb-2 w-full"
+                    className="mb-2 w-full appearance-none rounded-lg bg-white/40"
                 />
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between text-sm text-white/60">
                     <span>{formatTime(currentTime)}</span>
                     <span>{formatTime(duration)}</span>
                 </div>
                 <div className="mt-4 text-sm">
-                    <div>{fileName}</div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-white/80">{fileName}</div>
+                    <div className="text-xs text-white/30">
                         MODIFIED {modifiedDate}
                         <br/>
                         {fileSize}
@@ -132,7 +157,7 @@ const AudioPlayerModal = ({
                     </div>
                 </div>
                 <button
-                    className="absolute top-4 right-4 text-xl text-white"
+                    className="absolute top-4 right-4 text-xl text-black"
                     onClick={onClose}
                 >
                     &times;

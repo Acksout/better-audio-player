@@ -19,8 +19,18 @@ const FileShowcase = () => {
         }));
     };
 
-    const handleFileClick = (file) => {
-        setSelectedFile(file);
+    const handleFileClick = async (file) => {
+        if ("caches" in window) {
+            const cache = await caches.open("audio-files");
+            const cachedResponse = await cache.match(file.src);
+            if (!cachedResponse) {
+                const response = await fetch(file.src);
+                await cache.put(file.src, response.clone());
+            }
+            setSelectedFile(file);
+        } else {
+            setSelectedFile(file);
+        }
     };
 
     const handleModalClose = () => {
@@ -41,13 +51,20 @@ const FileShowcase = () => {
         fetchDirectoryContents();
     }, []);
 
-    const renderFileOrFolder = (item, index) => (
+    const capitalize = (str) => {
+        return str.split(" ").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+    };
+
+    const renderFileOrFolder = (item, index, isChild) => (
         <div
             key={item.id}
-            className="flex flex-row flex-wrap items-center space-x-4 hover:text-[#F1FF9B] cursor-pointer"
+            className={`flex flex-row flex-wrap items-center space-x-4 cursor-pointer p-2 ${
+                isChild ? "" : "border border-white/20 mb-4"
+            }`}
             onClick={() => item.fileType === "Folder" ? toggleExpand(item.id) : handleFileClick(item)}
         >
             {item.fileType === "Folder" && (
+
                 <Image
                     src={arrow}
                     alt="Arrow"
@@ -58,35 +75,37 @@ const FileShowcase = () => {
                     }`}
                 />
             )}
-            <p className="text-xs">{index + 1}</p>
             <Image
                 src={item.fileType === "Folder" ? folderIcon : audioWave}
                 alt="File Icon"
                 width={24}
                 height={24}
             />
-            <p className="pr-[473px]">{item.fileName}</p>
-            <p className="pr-10 text-sm">{item.modifiedDate}</p>
-            <p className="pr-10 text-sm">{item.fileSize}</p>
-            <p className="pr-10 text-sm">{item.fileType}</p>
+
+            <p className="pr-[500px] hover:text-[#F1FF9B] ">{capitalize(item.fileName)}</p>
+            <p className="text-sm pr-10 hover:text-[#F1FF9B]">{capitalize(item.modifiedDate)}</p>
+            <p className="text-sm pr-10 hover:text-[#F1FF9B]">{capitalize(item.fileSize)}</p>
+            <p className="text-sm pr-10 hover:text-[#F1FF9B]">{capitalize(item.fileType)}</p>
+
+
             {item.fileType === "Folder" && expandedFolders[item.id] && (
-                <div className="mt-2 ml-10 border-l border-white/20 pl-4">
-                    {item.children.map((child, childIndex) => renderFileOrFolder(child, childIndex))}
+                <div className="mt-2 ml-10 pl-4">
+                    {item.children.map((child, childIndex) => renderFileOrFolder(child, childIndex, true))}
                 </div>
             )}
         </div>
     );
 
     return (
-        <div className="border border-white/20">
+        <div>
             {files.map((item, index) => renderFileOrFolder(item, index))}
             {selectedFile && (
                 <AudioPlayerModal
                     src={selectedFile.src}
-                    fileName={selectedFile.fileName}
-                    fileSize={selectedFile.fileSize}
-                    fileType={selectedFile.fileType}
-                    modifiedDate={selectedFile.modifiedDate}
+                    fileName={capitalize(selectedFile.fileName)}
+                    fileSize={capitalize(selectedFile.fileSize)}
+                    fileType={capitalize(selectedFile.fileType)}
+                    modifiedDate={capitalize(selectedFile.modifiedDate)}
                     isOpen={true}
                     onClose={handleModalClose}
                 />
