@@ -25,7 +25,7 @@ Before you begin, ensure you have met the following requirements:
 
 ## Setting Up Your Own Server
 
-Follow these steps to set up your own 808 Vault server:
+Follow these steps to set up your own Better Audio Player server:
 
 1. Clone the repository:
 
@@ -77,7 +77,7 @@ To deploy Better Audio Player to a production environment, we recommend using [V
 
 2. Sign up for a Vercel account and connect it to your GitHub account.
 
-3. Import your 808 Vault repository into Vercel.
+3. Import your Better Audio Player repository into Vercel.
 
 4. Configure your environment variables in the Vercel dashboard.
 
@@ -87,7 +87,7 @@ Vercel will automatically build and deploy your application, providing you with 
 
 ## Contributing
 
-Contributions to 808 Vault are welcome! Here's how you can contribute:
+Contributions to Better Audio Player are welcome! Here's how you can contribute:
 
 1. Fork the repository
 2. Create a new branch (`git checkout -b feature/amazing-feature`)
