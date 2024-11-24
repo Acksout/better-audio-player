@@ -2,7 +2,8 @@
 
 Better Audio Player is a sleek, modern web application that allows you to host and stream your music files directly from Google Drive. With a clean interface and powerful audio playback capabilities, it's the perfect solution for music producers, DJs, and audio enthusiasts who want to organize and access their sound libraries with ease.
 
-![Better Audio Player Screenshot](https://i.imgur.com/bndJCZm.png)
+# 🎥 Video
+[![Watch the video](https://i.imgur.com/ILRo9ZX.png)](https://youtu.be/vnia9VxVj9A)
 
 ## Features
 
